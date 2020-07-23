@@ -35,16 +35,24 @@ namespace HTML2PDF
             Uri uri = null;
 
 
-            if (e.NewValue is string s)
+            try
             {
-                var uriString = s;
-                uri = string.IsNullOrWhiteSpace(uriString) ? null : new Uri(uriString);
+                if (e.NewValue is string s)
+                {
+                    var uriString = s;
+
+                    uri = string.IsNullOrWhiteSpace(uriString) ? null : new Uri(uriString);
+                }
+                else if (e.NewValue is Uri)
+                {
+                    uri = (Uri)e.NewValue;
+                }
+                browser.Source = uri;
             }
-            else if (e.NewValue is Uri)
+            catch (UriFormatException)
             {
-                uri = (Uri)e.NewValue;
+
             }
-            browser.Source = uri;
         }
     }
 }

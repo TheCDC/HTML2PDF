@@ -1,6 +1,8 @@
 ﻿using PdfSharp;
 using PdfSharp.Pdf;
+using System;
 using System.IO;
+using System.Threading.Tasks;
 using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace HTML2PDF.Models
@@ -14,14 +16,23 @@ namespace HTML2PDF.Models
             this.SourceHTMLPath = SourceHTMLPath;
             this.DestinationPDFPath = DestinationPDFPath;
         }
-        public async void Convert()
+        public async Task Convert()
         {
-            using (StreamReader sr = new StreamReader(SourceHTMLPath))
+            try
             {
-                string all = await sr.ReadToEndAsync();
 
-                PdfDocument pdf = PdfGenerator.GeneratePdf(all, PageSize.A4, 0);
-                pdf.Save(DestinationPDFPath);
+                using (StreamReader sr = new StreamReader(SourceHTMLPath))
+                {
+                    string all = await sr.ReadToEndAsync();
+
+                    PdfDocument pdf = PdfGenerator.GeneratePdf(all, PageSize.A4, cssData: PdfGenerator.ParseStyleSheet(@"p, li, h1, h2, h3, b {page-break-inside: avoid;}"));
+                    pdf.Save(DestinationPDFPath);
+
+                }
+            }
+            catch (NotSupportedException ex)
+            {
+                throw ex;
             }
         }
     }
