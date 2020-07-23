@@ -44,7 +44,7 @@
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="2">
             <Button Command="{Binding DoConversionCommand}">Convert!</Button>
-            <Label ></Label>
+            <Label Content="{Binding LoadingStatusLabel}"></Label>
         </StackPanel>
         <Grid Grid.Row="2" Grid.Column="0" Background="Gray">
             <Grid.RowDefinitions>

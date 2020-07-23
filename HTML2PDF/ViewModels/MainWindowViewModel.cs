@@ -79,20 +79,16 @@ namespace HTML2PDF.ViewModels
         {
             return SelectedSourcePath?.Length > 0 && SelectedDestinationPath?.Length > 0;
         }
-        public async void DoConversion()
+        public void DoConversion()
         {
-            await Task.Run(() =>
-            {
-                var conversionModel = new HTMLtoPDFModel(SelectedSourcePath, SelectedDestinationPath);
-                conversionModel.Convert();
-                Process p = new Process();
-                p.StartInfo.FileName = SelectedDestinationPath;
-                p.StartInfo.Verb = "open";
-                p.Start();
-
-
-            });
-
+            LoadingStatusLabel = "loading...";
+            var conversionModel = new HTMLtoPDFModel(SelectedSourcePath, SelectedDestinationPath);
+            conversionModel.Convert();
+            Process p = new Process();
+            p.StartInfo.FileName = SelectedDestinationPath;
+            p.StartInfo.Verb = "open";
+            p.Start();
+            LoadingStatusLabel = "Done!";
         }
     }
 }

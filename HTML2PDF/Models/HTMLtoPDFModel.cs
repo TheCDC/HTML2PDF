@@ -20,7 +20,7 @@ namespace HTML2PDF.Models
             {
                 string all = await sr.ReadToEndAsync();
 
-                PdfDocument pdf = PdfGenerator.GeneratePdf(all, PageSize.A4, 0);
+                PdfDocument pdf = PdfGenerator.GeneratePdf(all, PageSize.A4, cssData: PdfGenerator.ParseStyleSheet(@"p, li, h1, h2, h3, b {page-break-inside: avoid;}"));
                 pdf.Save(DestinationPDFPath);
             }
         }
