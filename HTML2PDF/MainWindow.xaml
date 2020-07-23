@@ -8,7 +8,8 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Width="800"
-        SizeToContent="Height"
+        Height="800"
+        
         >
     <Window.DataContext>
         <ViewModels:MainWindowViewModel></ViewModels:MainWindowViewModel>
@@ -27,13 +28,13 @@
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.Column="0">
             <StackPanel>
-                <TextBox Text="{Binding SelectedSourcePath}" Grid.Row="0"></TextBox>
+                <TextBox Text="{Binding SelectedSourcePath, Mode=TwoWay}" Grid.Row="0"></TextBox>
                 <Button Command="{Binding DoSelectSourceCommand, Mode=Default}">Choose Source</Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="0" Grid.Column="1">
             <StackPanel Orientation="Vertical">
-                <TextBox Text="{Binding SelectedDestinationPath}" Grid.Row="0"></TextBox>
+                <TextBox Text="{Binding SelectedDestinationPath, Mode=TwoWay}" Grid.Row="0"></TextBox>
                 <Button Command="{Binding DoSelectDestinationCommand}">Choose Destination</Button>
             </StackPanel>
         </Grid>

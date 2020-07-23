@@ -79,16 +79,32 @@ namespace HTML2PDF.ViewModels
         {
             return SelectedSourcePath?.Length > 0 && SelectedDestinationPath?.Length > 0;
         }
-        public void DoConversion()
+        public async void DoConversion()
         {
             LoadingStatusLabel = "loading...";
-            var conversionModel = new HTMLtoPDFModel(SelectedSourcePath, SelectedDestinationPath);
-            conversionModel.Convert();
-            Process p = new Process();
-            p.StartInfo.FileName = SelectedDestinationPath;
-            p.StartInfo.Verb = "open";
-            p.Start();
-            LoadingStatusLabel = "Done!";
+            try
+            {
+
+                var conversionModel = new HTMLtoPDFModel(SelectedSourcePath, SelectedDestinationPath);
+                try
+                {
+
+                    await conversionModel.Convert();
+                    Process p = new Process();
+                    p.StartInfo.FileName = SelectedDestinationPath;
+                    p.StartInfo.Verb = "open";
+                    p.Start();
+                    LoadingStatusLabel = "Done!";
+                }
+                catch (NotSupportedException)
+                {
+                    LoadingStatusLabel = "Unsupported URI!";
+                }
+            }
+            catch (Exception ex)
+            {
+                LoadingStatusLabel = ex.ToString();
+            }
         }
     }
 }
