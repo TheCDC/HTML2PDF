@@ -43,9 +43,9 @@ namespace HTML2PDF
 
                     uri = string.IsNullOrWhiteSpace(uriString) ? null : new Uri(uriString);
                 }
-                else if (e.NewValue is Uri)
+                else if (e.NewValue is Uri uri1)
                 {
-                    uri = (Uri)e.NewValue;
+                    uri = uri1;
                 }
                 browser.Source = uri;
             }

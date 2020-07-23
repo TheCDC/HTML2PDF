@@ -16,18 +16,19 @@ namespace HTML2PDF.Models
             this.SourceHTMLPath = SourceHTMLPath;
             this.DestinationPDFPath = DestinationPDFPath;
         }
+        /// <summary>
+        /// Perform the HTML-PDF conversion/
+        /// </summary>
+        /// <returns></returns>
         public async Task Convert()
         {
             try
             {
-
                 using (StreamReader sr = new StreamReader(SourceHTMLPath))
                 {
                     string all = await sr.ReadToEndAsync();
-
                     PdfDocument pdf = PdfGenerator.GeneratePdf(all, PageSize.A4, cssData: PdfGenerator.ParseStyleSheet(@"p, li, h1, h2, h3, b {page-break-inside: avoid;}"));
                     pdf.Save(DestinationPDFPath);
-
                 }
             }
             catch (NotSupportedException ex)

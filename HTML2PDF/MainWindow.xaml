@@ -32,7 +32,7 @@
                 <Button Command="{Binding DoSelectSourceCommand, Mode=Default}">Choose Source</Button>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="0" Grid.Column="1">
+        <Grid Grid.Row="0" Grid.Column="1" >
             <StackPanel Orientation="Vertical">
                 <TextBox Text="{Binding SelectedDestinationPath, Mode=TwoWay}" Grid.Row="0"></TextBox>
                 <Button Command="{Binding DoSelectDestinationCommand}">Choose Destination</Button>
@@ -43,9 +43,9 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1">
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="2">
+        <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
             <Button Command="{Binding DoConversionCommand}">Convert!</Button>
-            <Label Content="{Binding LoadingStatusLabel}"></Label>
+            <TextBlock Text="{Binding LoadingStatusLabel}" TextWrapping="Wrap" ></TextBlock>
         </StackPanel>
         <Grid Grid.Row="2" Grid.Column="0" Background="Gray">
             <Grid.RowDefinitions>
@@ -59,7 +59,6 @@
 
             <WebBrowser Name="MyWebBrowser" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                         local:WebBrowserHelper.Url="{Binding SelectedSourcePath}" Grid.ColumnSpan="2"
-                        
                         />
 
         </Grid>
