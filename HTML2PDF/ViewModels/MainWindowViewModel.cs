@@ -11,93 +11,52 @@ using System.Windows.Input;
 
 namespace HTML2PDF.ViewModels
 {
-    class MainWindowViewModel : INotifyPropertyChanged
+    internal class MainWindowViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        private string _SelectedSourcePath;
-        private string _SelectedDestinationPath;
-        private string _LoadingStatusLabel;
         private ICommand _DoConversionCommand;
-        private ICommand _DoSelectSourceCommand;
+
         private ICommand _DoSelectDestinationCommand;
-        /// <summary>
-        /// User-selected document source URI
-        /// </summary>
-        public string SelectedSourcePath { get => _SelectedSourcePath; set { _SelectedSourcePath = value; NotifyPropertyChanged(); } }
-        /// <summary>
-        /// User-selected document destination URI
-        /// </summary>
-        public string SelectedDestinationPath { get => _SelectedDestinationPath; set { _SelectedDestinationPath = value; NotifyPropertyChanged(); } }
-        /// <summary>
-        /// User-facing status message
-        /// </summary>
-        public string LoadingStatusLabel { get => _LoadingStatusLabel; set { _LoadingStatusLabel = value; NotifyPropertyChanged(); } }
+
+        private ICommand _DoSelectSourceCommand;
+
+        private string _LoadingStatusLabel;
+
+        private string _SelectedDestinationPath;
+
+        private string _SelectedSourcePath;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// User initiates the conversion from source to destination
         /// </summary>
         public ICommand DoConversionCommand => _DoConversionCommand ?? (_DoConversionCommand = new RelayCommand.RelayCommand(DoConversion, CanDoConversion));
-        /// <summary>
-        /// User initiates setting the source document URI
-        /// </summary>
-        public ICommand DoSelectSourceCommand => _DoSelectSourceCommand ?? (_DoSelectSourceCommand = new RelayCommand.RelayCommand(DoSelectSource, CanDoSelectSource));
+
         /// <summary>
         /// User initiates setting the destination document URI
         /// </summary>
         public ICommand DoSelectDestinationCommand => _DoSelectDestinationCommand ?? (_DoSelectDestinationCommand = new RelayCommand.RelayCommand(DoSelectDestination, CanDoSelectDestination));
-        /// <summary>
-        /// Is user currently allowed to set source URI?
-        /// </summary>
-        /// <returns></returns>
-        private bool CanDoSelectSource()
-        {
-            return true;
-        }
-        /// <summary>
-        /// Select source using File Open dialog
-        /// </summary>
-        private void DoSelectSource()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
-            {
-                Filter = "HTML File (*.xhtml; *.html)|*.xhtml; *.html",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-            };
-            var userDidSelectAPath = openFileDialog.ShowDialog();
 
-            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
-            {
-                SelectedSourcePath = openFileDialog.FileName;
-            }
-        }
         /// <summary>
-        /// Is user currently allowed to set destination URI?
+        /// User initiates setting the source document URI
         /// </summary>
-        /// <returns></returns>
-        private bool CanDoSelectDestination()
-        {
-            return true;
-        }
+        public ICommand DoSelectSourceCommand => _DoSelectSourceCommand ?? (_DoSelectSourceCommand = new RelayCommand.RelayCommand(DoSelectSource, CanDoSelectSource));
+
         /// <summary>
-        /// Select destination URI using File Save dialog
+        /// User-facing status message
         /// </summary>
-        private void DoSelectDestination()
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog()
-            {
-                Filter = "PDF File (*.pdf)|*.pdf",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                FileName = "output.pdf",
-            };
-            var userDidSelectAPath = saveFileDialog.ShowDialog();
-            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
-            {
-                SelectedDestinationPath = saveFileDialog.FileName;
-            }
-        }
+        public string LoadingStatusLabel { get => _LoadingStatusLabel; set { _LoadingStatusLabel = value; NotifyPropertyChanged(); } }
+
+        /// <summary>
+        /// User-selected document destination URI
+        /// </summary>
+        public string SelectedDestinationPath { get => _SelectedDestinationPath; set { _SelectedDestinationPath = value; NotifyPropertyChanged(); } }
+
+        /// <summary>
+        /// User-selected document source URI
+        /// </summary>
+        public string SelectedSourcePath { get => _SelectedSourcePath; set { _SelectedSourcePath = value; NotifyPropertyChanged(); } }
+
         /// <summary>
         /// Is User currently allowed to initiate document conversion?
         /// </summary>
@@ -106,6 +65,7 @@ namespace HTML2PDF.ViewModels
         {
             return SelectedSourcePath?.Length > 0 && SelectedDestinationPath?.Length > 0;
         }
+
         /// <summary>
         /// Do the work of document conversion
         /// Async so that CPU-heavy operations can happen in the background.
@@ -147,6 +107,65 @@ namespace HTML2PDF.ViewModels
                   }
                   return "Done!";
               });
+        }
+
+        /// <summary>
+        /// Is user currently allowed to set destination URI?
+        /// </summary>
+        /// <returns></returns>
+        private bool CanDoSelectDestination()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Is user currently allowed to set source URI?
+        /// </summary>
+        /// <returns></returns>
+        private bool CanDoSelectSource()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Select destination URI using File Save dialog
+        /// </summary>
+        private void DoSelectDestination()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog()
+            {
+                Filter = "PDF File (*.pdf)|*.pdf",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                FileName = "output.pdf",
+            };
+            var userDidSelectAPath = saveFileDialog.ShowDialog();
+            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
+            {
+                SelectedDestinationPath = saveFileDialog.FileName;
+            }
+        }
+
+        /// <summary>
+        /// Select source using File Open dialog
+        /// </summary>
+        private void DoSelectSource()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog()
+            {
+                Filter = "HTML File (*.xhtml; *.html)|*.xhtml; *.html",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            };
+            var userDidSelectAPath = openFileDialog.ShowDialog();
+
+            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
+            {
+                SelectedSourcePath = openFileDialog.FileName;
+            }
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

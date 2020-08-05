@@ -10,7 +10,6 @@ namespace HTML2PDF
     /// </summary>
     public static class WebBrowserHelper
     {
-
         public static readonly DependencyProperty UrlProperty =
             DependencyProperty.RegisterAttached("Url", typeof(string), typeof(WebBrowserHelper),
                 new PropertyMetadata(OnUrlChanged));
@@ -34,7 +33,6 @@ namespace HTML2PDF
 
             Uri uri = null;
 
-
             try
             {
                 if (e.NewValue is string s)
@@ -51,7 +49,6 @@ namespace HTML2PDF
             }
             catch (UriFormatException)
             {
-
             }
         }
     }
