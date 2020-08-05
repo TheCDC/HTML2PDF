@@ -29,7 +29,6 @@ namespace HTML2PDF.ViewModels
         {
             ListConversionStatusUpdates = new ObservableCollection<string>();
         }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace HTML2PDF.ViewModels
         /// </summary>
         public ICommand DoConversionCommand => _DoConversionCommand ?? (_DoConversionCommand = new RelayCommand.RelayCommand(DoConversion, CanDoConversion));
 
-        /// <summary>
+/// <summary>
         /// User initiates setting the destination document URI
         /// </summary>
         public ICommand DoSelectDestinationCommand => _DoSelectDestinationCommand ?? (_DoSelectDestinationCommand = new RelayCommand.RelayCommand(DoSelectDestination, CanDoSelectDestination));
@@ -184,6 +183,7 @@ namespace HTML2PDF.ViewModels
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         }
     }
 }

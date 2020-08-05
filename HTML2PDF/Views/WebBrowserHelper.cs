@@ -49,6 +49,7 @@ namespace HTML2PDF
             }
             catch (UriFormatException)
             {
+
             }
         }
     }

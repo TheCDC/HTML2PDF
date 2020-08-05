@@ -29,7 +29,7 @@
                 <Button Command="{Binding DoSelectSourceCommand, Mode=Default}">Choose Source</Button>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="0" Grid.Column="1">
+        <Grid Grid.Row="0" Grid.Column="1" >
             <StackPanel Orientation="Vertical">
                 <TextBox Text="{Binding SelectedDestinationPath, Mode=TwoWay}" Grid.Row="0"></TextBox>
                 <Button Command="{Binding DoSelectDestinationCommand}">Choose Destination</Button>
@@ -61,7 +61,6 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-
             <WebBrowser Name="MyWebBrowser" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                         local:WebBrowserHelper.Url="{Binding SelectedSourcePath}" Grid.ColumnSpan="2" />
         </Grid>
