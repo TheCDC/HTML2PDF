@@ -7,10 +7,10 @@ namespace HTML2PDF.ViewModels.RelayCommand
     {
         #region Fields
 
-        readonly Action<T> _execute = null;
-        readonly Predicate<T> _canExecute = null;
+        private readonly Action<T> _execute = null;
+        private readonly Predicate<T> _canExecute = null;
 
-        #endregion
+        #endregion Fields
 
         #region Constructors
 
@@ -35,7 +35,7 @@ namespace HTML2PDF.ViewModels.RelayCommand
             _canExecute = canExecute;
         }
 
-        #endregion
+        #endregion Constructors
 
         #region ICommand Members
 
@@ -69,8 +69,9 @@ namespace HTML2PDF.ViewModels.RelayCommand
             _execute((T)parameter);
         }
 
-        #endregion
+        #endregion ICommand Members
     }
+
     public class RelayCommand : ICommand
     {
         //https://docs.telerik.com/data-access/quick-start-scenarios/wpf/quickstart-wpf-viewmodelbase-and-relaycommand
@@ -79,17 +80,21 @@ namespace HTML2PDF.ViewModels.RelayCommand
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
+
         private readonly Action methodToExecute;
         private readonly Func<bool> canExecuteEvaluator;
+
         public RelayCommand(Action methodToExecute, Func<bool> canExecuteEvaluator)
         {
             this.methodToExecute = methodToExecute;
             this.canExecuteEvaluator = canExecuteEvaluator;
         }
+
         public RelayCommand(Action methodToExecute)
             : this(methodToExecute, null)
         {
         }
+
         public bool CanExecute(object parameter)
         {
             if (canExecuteEvaluator == null)
@@ -102,10 +107,10 @@ namespace HTML2PDF.ViewModels.RelayCommand
                 return result;
             }
         }
+
         public void Execute(object parameter)
         {
             methodToExecute.Invoke();
         }
     }
-
 }
