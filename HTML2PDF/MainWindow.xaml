@@ -41,7 +41,17 @@
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
             <Button Command="{Binding DoConversionCommand}">Convert!</Button>
-            <TextBlock Text="{Binding LoadingStatusLabel}" TextWrapping="Wrap" ></TextBlock>
+            <TextBlock Text="{Binding ErrorStatusLabel}" TextWrapping="Wrap" ></TextBlock>
+            <ListView ItemsSource="{Binding ListConversionStatusUpdates}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border>
+
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap"></TextBlock>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackPanel>
         <Grid Grid.Row="2" Grid.Column="0" Background="Gray">
             <Grid.RowDefinitions>
