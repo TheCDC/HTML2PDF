@@ -84,7 +84,7 @@ namespace HTML2PDF.ViewModels
         {
             ErrorStatusLabel = "Converting...";
             //Map error types to user-facing messages
-            var errorMessages = new Dictionary<Type, string>() {
+            var errorTypeToMessage = new Dictionary<Type, string>() {
                 { typeof(NotSupportedException),"Unsupported URI!" },
                 { typeof(ArgumentException),"Bad Source URI. Illegal characters?" },
                 { typeof(FileNotFoundException),"File could not be found! Make sure Source exists." },
@@ -112,10 +112,10 @@ namespace HTML2PDF.ViewModels
                  catch (Exception ex)
                  {
                      var t = ex.GetType();
-                     if (errorMessages.ContainsKey(t))
+                     if (errorTypeToMessage.ContainsKey(t))
                      {
                          //Error is an expected type of error
-                         return "Error: " + errorMessages[ex.GetType()];
+                         return "Error: " + errorTypeToMessage[ex.GetType()];
                      }
                      else
                      {
@@ -168,17 +168,7 @@ namespace HTML2PDF.ViewModels
         /// </summary>
         private void DoSelectSource()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
-            {
-                Filter = "HTML File (*.xhtml; *.html)|*.xhtml; *.html",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-            };
-            var userDidSelectAPath = openFileDialog.ShowDialog();
-
-            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
-            {
-                SelectedSourcePath = openFileDialog.FileName;
-            }
+            SelectedSourcePath = HTMLtoPDFModel.ChoosePath();
         }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")

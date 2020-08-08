@@ -3,24 +3,56 @@ using PdfSharp.Pdf;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using TheArtOfDev.HtmlRenderer.PdfSharp;
+using Microsoft.Win32;
 
 namespace HTML2PDF.Models
 {
     internal class HTMLtoPDFModel
     {
-        public string SourceHTMLPath;
         public string DestinationPDFPath;
-
+        public string SourceHTMLPath;
         public HTMLtoPDFModel(string SourceHTMLPath, string DestinationPDFPath)
         {
             this.SourceHTMLPath = SourceHTMLPath;
             this.DestinationPDFPath = DestinationPDFPath;
         }
 
-        private PdfDocument GetDocument(string html)
+        public static string ChoosePath()
         {
-            return PdfGenerator.GeneratePdf(html, PageSize.A4, cssData: PdfGenerator.ParseStyleSheet(@"p, li, h1, h2, h3, b {page-break-inside: avoid;}; img {width: 100vw}"));
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog()
+            {
+                Filter = "HTML File (*.xhtml; *.html)|*.xhtml; *.html",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            };
+            var userDidSelectAPath = openFileDialog.ShowDialog();
+
+            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
+            {
+                return openFileDialog.FileName;
+            }
+            return null;
+        }
+        /// <summary>
+        /// Perform the HTML-PDF conversion/
+        /// </summary>
+        /// <returns></returns>
+        public void Convert()
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader(SourceHTMLPath))
+                {
+                    string all = sr.ReadToEnd();
+                    PdfDocument pdf = GetDocument(all);
+                    pdf.Save(DestinationPDFPath);
+                }
+            }
+            catch (NotSupportedException ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -49,25 +81,9 @@ namespace HTML2PDF.Models
             }
         }
 
-        /// <summary>
-        /// Perform the HTML-PDF conversion/
-        /// </summary>
-        /// <returns></returns>
-        public void Convert()
+        private PdfDocument GetDocument(string html)
         {
-            try
-            {
-                using (StreamReader sr = new StreamReader(SourceHTMLPath))
-                {
-                    string all = sr.ReadToEnd();
-                    PdfDocument pdf = GetDocument(all);
-                    pdf.Save(DestinationPDFPath);
-                }
-            }
-            catch (NotSupportedException ex)
-            {
-                throw ex;
-            }
+            return PdfGenerator.GeneratePdf(html, PageSize.A4, cssData: PdfGenerator.ParseStyleSheet(@"p, li, h1, h2, h3, b {page-break-inside: avoid;}; img {width: 100vw}"));
         }
     }
 }
