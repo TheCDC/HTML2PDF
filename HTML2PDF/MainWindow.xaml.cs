@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using Autofac;
+using HTML2PDF.Models;
+using HTML2PDF.ViewModels;
+using System.ComponentModel;
+using System.Windows;
 
 namespace HTML2PDF
 {

@@ -1,10 +1,8 @@
-﻿using Autofac;
-using HTML2PDF.Models;
+﻿using HTML2PDF.Models;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reactive.Subjects;
@@ -13,35 +11,27 @@ using System.Windows.Input;
 
 namespace HTML2PDF.ViewModels
 {
-    internal class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
+    internal class PdfConverterViewModel : ViewModelBase
     {
-        private PdfConverterViewModel _CurrentViewModel;
         private ICommand _DoConversionCommand;
 
         private ICommand _DoSelectDestinationCommand;
 
         private ICommand _DoSelectSourceCommand;
+
         private string _LoadingStatusLabel;
 
-        private ICommand _NewJobCommand;
         private string _SelectedDestinationPath;
 
         private string _SelectedSourcePath;
 
-        public MainWindowViewModel()
+        public PdfConverterViewModel()
         {
-            ListConversionStatusUpdates = new ObservableCollection<string>();
-            Container = GetContainer();
-            CurrentViewModel = Container.Resolve<PdfConverterViewModel>();
         }
 
-        public PdfConverterViewModel CurrentViewModel
+        public PdfConverterViewModel(IPdfConverterService pdfConverterService)
         {
-            get => _CurrentViewModel; set
-            {
-                _CurrentViewModel = value;
-                NotifyPropertyChanged();
-            }
+            PdfConverterService = pdfConverterService;
         }
 
         /// <summary>
@@ -69,7 +59,7 @@ namespace HTML2PDF.ViewModels
         /// </summary>
         public ObservableCollection<string> ListConversionStatusUpdates { get; set; } = new ObservableCollection<string>();
 
-        public ICommand NewJobCommand => _NewJobCommand ?? (_NewJobCommand = new RelayCommand.RelayCommand(DoNewJob));
+        public IPdfConverterService PdfConverterService { get; }
 
         /// <summary>
         /// User-selected document destination URI
@@ -80,17 +70,6 @@ namespace HTML2PDF.ViewModels
         /// User-selected document source URI
         /// </summary>
         public string SelectedSourcePath { get => _SelectedSourcePath; set { _SelectedSourcePath = value; NotifyPropertyChanged(); } }
-
-        private static Autofac.IContainer Container
-        { get; set; }
-
-        public static Autofac.IContainer GetContainer()
-        {
-            var builder = new ContainerBuilder();
-            builder.RegisterType<HTMLtoPDFService>().As<IPdfConverterService>();
-            builder.RegisterType<PdfConverterViewModel>();
-            return builder.Build();
-        }
 
         /// <summary>
         /// Is User currently allowed to initiate document conversion?
@@ -127,37 +106,32 @@ namespace HTML2PDF.ViewModels
             });
             //Do the bulk of work, the time consuming part of conversion
             ErrorStatusLabel = await Task.Run(async () =>
-             {
-                 try
-                 {
-                     var conversionModel = new HTMLtoPDFModel(SelectedSourcePath, SelectedDestinationPath);
-                     await conversionModel.ConvertAsync(progress);
-                     Process p = new Process();
-                     p.StartInfo.FileName = SelectedDestinationPath;
-                     p.StartInfo.Verb = "open";
-                     p.Start();
-                 }
-                 catch (Exception ex)
-                 {
-                     var t = ex.GetType();
-                     if (errorMessages.ContainsKey(t))
-                     {
-                         //Error is an expected type of error
-                         return "Error: " + errorMessages[ex.GetType()];
-                     }
-                     else
-                     {
-                         //Error is unexpected.
-                         return "Error: " + ex.Message;
-                     }
-                 }
-                 return "Done!";
-             });
-        }
-
-        public void DoNewJob()
-        {
-            CurrentViewModel = Container.Resolve<PdfConverterViewModel>();
+            {
+                try
+                {
+                    var conversionModel = new HTMLtoPDFModel(SelectedSourcePath, SelectedDestinationPath);
+                    await conversionModel.ConvertAsync(progress);
+                    Process p = new Process();
+                    p.StartInfo.FileName = SelectedDestinationPath;
+                    p.StartInfo.Verb = "open";
+                    p.Start();
+                }
+                catch (Exception ex)
+                {
+                    var t = ex.GetType();
+                    if (errorMessages.ContainsKey(t))
+                    {
+                        //Error is an expected type of error
+                        return "Error: " + errorMessages[ex.GetType()];
+                    }
+                    else
+                    {
+                        //Error is unexpected.
+                        return "Error: " + ex.Message;
+                    }
+                }
+                return "Done!";
+            });
         }
 
         /// <summary>

@@ -7,7 +7,27 @@ using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace HTML2PDF.Models
 {
-    internal class HTMLtoPDFModel
+    public interface IPdfConverter
+    {
+        Task ConvertAsync(IProgress<string> progress);
+
+        void Convert(IProgress<string> progress);
+    }
+
+    public interface IPdfConverterService
+    {
+        IPdfConverter GetConverter(string source, string destination);
+    }
+
+    public class HTMLtoPDFService : IPdfConverterService
+    {
+        public IPdfConverter GetConverter(string source, string destination)
+        {
+            return new HTMLtoPDFModel(source, destination);
+        }
+    }
+
+    internal class HTMLtoPDFModel : IPdfConverter
     {
         public string SourceHTMLPath;
         public string DestinationPDFPath;
@@ -53,7 +73,7 @@ namespace HTML2PDF.Models
         /// Perform the HTML-PDF conversion/
         /// </summary>
         /// <returns></returns>
-        public void Convert()
+        public void Convert(IProgress<string> progress)
         {
             try
             {
