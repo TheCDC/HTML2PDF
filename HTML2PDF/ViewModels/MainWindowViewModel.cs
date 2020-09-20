@@ -1,14 +1,7 @@
 ﻿using Autofac;
 using HTML2PDF.Models;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Reactive.Subjects;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace HTML2PDF.ViewModels
@@ -16,17 +9,10 @@ namespace HTML2PDF.ViewModels
     internal class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
     {
         private PdfConverterViewModel _CurrentViewModel;
-        private ICommand _DoConversionCommand;
 
-        private ICommand _DoSelectDestinationCommand;
-
-        private ICommand _DoSelectSourceCommand;
         private string _LoadingStatusLabel;
 
         private ICommand _NewJobCommand;
-        private string _SelectedDestinationPath;
-
-        private string _SelectedSourcePath;
 
         public MainWindowViewModel()
         {
@@ -45,21 +31,6 @@ namespace HTML2PDF.ViewModels
         }
 
         /// <summary>
-        /// User initiates the conversion from source to destination
-        /// </summary>
-        public ICommand DoConversionCommand => _DoConversionCommand ?? (_DoConversionCommand = new RelayCommand.RelayCommand(DoConversion, CanDoConversion));
-
-        /// <summary>
-        /// User initiates setting the destination document URI
-        /// </summary>
-        public ICommand DoSelectDestinationCommand => _DoSelectDestinationCommand ?? (_DoSelectDestinationCommand = new RelayCommand.RelayCommand(DoSelectDestination, CanDoSelectDestination));
-
-        /// <summary>
-        /// User initiates setting the source document URI
-        /// </summary>
-        public ICommand DoSelectSourceCommand => _DoSelectSourceCommand ?? (_DoSelectSourceCommand = new RelayCommand.RelayCommand(DoSelectSource, CanDoSelectSource));
-
-        /// <summary>
         /// User-facing status message
         /// </summary>
         public string ErrorStatusLabel { get => _LoadingStatusLabel; set { _LoadingStatusLabel = value; NotifyPropertyChanged(); } }
@@ -70,16 +41,6 @@ namespace HTML2PDF.ViewModels
         public ObservableCollection<string> ListConversionStatusUpdates { get; set; } = new ObservableCollection<string>();
 
         public ICommand NewJobCommand => _NewJobCommand ?? (_NewJobCommand = new RelayCommand.RelayCommand(DoNewJob));
-
-        /// <summary>
-        /// User-selected document destination URI
-        /// </summary>
-        public string SelectedDestinationPath { get => _SelectedDestinationPath; set { _SelectedDestinationPath = value; NotifyPropertyChanged(); } }
-
-        /// <summary>
-        /// User-selected document source URI
-        /// </summary>
-        public string SelectedSourcePath { get => _SelectedSourcePath; set { _SelectedSourcePath = value; NotifyPropertyChanged(); } }
 
         private static Autofac.IContainer Container
         { get; set; }
@@ -92,126 +53,9 @@ namespace HTML2PDF.ViewModels
             return builder.Build();
         }
 
-        /// <summary>
-        /// Is User currently allowed to initiate document conversion?
-        /// </summary>
-        /// <returns></returns>
-        public bool CanDoConversion()
-        {
-            return SelectedSourcePath?.Length > 0 && SelectedDestinationPath?.Length > 0;
-        }
-
-        /// <summary>
-        /// Do the work of document conversion
-        /// Async so that CPU-heavy operations can happen in the background.
-        /// </summary>
-        public async void DoConversion()
-        {
-            ErrorStatusLabel = "Converting...";
-            //Map error types to user-facing messages
-            var errorMessages = new Dictionary<Type, string>() {
-                { typeof(NotSupportedException),"Unsupported URI!" },
-                { typeof(ArgumentException),"Bad Source URI. Illegal characters?" },
-                { typeof(FileNotFoundException),"File could not be found! Make sure Source exists." },
-                { typeof(AggregateException),  "Multiple errors occurred."}
-            };
-            //Clear all status updates for the new task
-            ListConversionStatusUpdates.Clear();
-            //Create a unit of work for reporting task progress
-            ISubject<string> source = new Subject<string>();
-
-            var progress = new Progress<string>(message =>
-            {
-                source.OnNext(message);
-                ListConversionStatusUpdates.Add(message);
-            });
-            //Do the bulk of work, the time consuming part of conversion
-            ErrorStatusLabel = await Task.Run(async () =>
-             {
-                 try
-                 {
-                     var conversionModel = new HTMLtoPDFModel(SelectedSourcePath, SelectedDestinationPath);
-                     await conversionModel.ConvertAsync(progress);
-                     Process p = new Process();
-                     p.StartInfo.FileName = SelectedDestinationPath;
-                     p.StartInfo.Verb = "open";
-                     p.Start();
-                 }
-                 catch (Exception ex)
-                 {
-                     var t = ex.GetType();
-                     if (errorMessages.ContainsKey(t))
-                     {
-                         //Error is an expected type of error
-                         return "Error: " + errorMessages[ex.GetType()];
-                     }
-                     else
-                     {
-                         //Error is unexpected.
-                         return "Error: " + ex.Message;
-                     }
-                 }
-                 return "Done!";
-             });
-        }
-
         public void DoNewJob()
         {
             CurrentViewModel = Container.Resolve<PdfConverterViewModel>();
-        }
-
-        /// <summary>
-        /// Is user currently allowed to set destination URI?
-        /// </summary>
-        /// <returns></returns>
-        private bool CanDoSelectDestination()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Is user currently allowed to set source URI?
-        /// </summary>
-        /// <returns></returns>
-        private bool CanDoSelectSource()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Select destination URI using File Save dialog
-        /// </summary>
-        private void DoSelectDestination()
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog()
-            {
-                Filter = "PDF File (*.pdf)|*.pdf",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                FileName = "output.pdf",
-            };
-            var userDidSelectAPath = saveFileDialog.ShowDialog();
-            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
-            {
-                SelectedDestinationPath = saveFileDialog.FileName;
-            }
-        }
-
-        /// <summary>
-        /// Select source using File Open dialog
-        /// </summary>
-        private void DoSelectSource()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
-            {
-                Filter = "HTML File (*.xhtml; *.html)|*.xhtml; *.html",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-            };
-            var userDidSelectAPath = openFileDialog.ShowDialog();
-
-            if (userDidSelectAPath.HasValue && userDidSelectAPath.Value)
-            {
-                SelectedSourcePath = openFileDialog.FileName;
-            }
         }
     }
 }

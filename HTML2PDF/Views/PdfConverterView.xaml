@@ -24,7 +24,7 @@
         <Grid Grid.Row="0" Grid.Column="0">
             <StackPanel>
                 <TextBox Text="{Binding SelectedSourcePath, Mode=TwoWay}" Grid.Row="0"></TextBox>
-                <Button Command="{Binding DoSelectSourceCommand, Mode=Default}">Choose Source</Button>
+                <Button Command="{Binding DoSelectSourceCommand}">Choose Source</Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="0" Grid.Column="1">
@@ -61,7 +61,7 @@
             </Grid.ColumnDefinitions>
 
             <WebBrowser Name="MyWebBrowser" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                        root:WebBrowserHelper.Url="{Binding SelectedSourcePath}" Grid.ColumnSpan="2" />
+                        root:WebBrowserHelper.Url="{Binding SelectedSourcePath, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2" />
         </Grid>
         <Grid Grid.Row="2" Grid.Column="1" Background="Gray">
             <Rectangle Fill="White" Height="220" Width="170" Margin="10,10,10,10"></Rectangle>
