@@ -1,24 +1,25 @@
-﻿using Autofac;
-using HTML2PDF.Models;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Input;
 
 namespace HTML2PDF.ViewModels
 {
     internal class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
     {
+        public Func<PdfConverterViewModel> PdfConverterViewModelFactory;
         private PdfConverterViewModel _CurrentViewModel;
 
         private string _LoadingStatusLabel;
 
-        private ICommand _NewJobCommand;
+        public MainWindowViewModel(Func<PdfConverterViewModel> PdfConverterViewModelFactory) : base()
+        {
+            this.PdfConverterViewModelFactory = PdfConverterViewModelFactory;
+            CurrentViewModel = PdfConverterViewModelFactory();
+        }
 
         public MainWindowViewModel()
         {
-            ListConversionStatusUpdates = new ObservableCollection<string>();
-            Container = GetContainer();
-            CurrentViewModel = Container.Resolve<PdfConverterViewModel>();
+            Initialize();
         }
 
         public PdfConverterViewModel CurrentViewModel
@@ -40,22 +41,9 @@ namespace HTML2PDF.ViewModels
         /// </summary>
         public ObservableCollection<string> ListConversionStatusUpdates { get; set; } = new ObservableCollection<string>();
 
-        public ICommand NewJobCommand => _NewJobCommand ?? (_NewJobCommand = new RelayCommand.RelayCommand(DoNewJob));
-
-        private static Autofac.IContainer Container
-        { get; set; }
-
-        public static Autofac.IContainer GetContainer()
+        public void Initialize()
         {
-            var builder = new ContainerBuilder();
-            builder.RegisterType<HTMLtoPDFService>().As<IPdfConverterService>();
-            builder.RegisterType<PdfConverterViewModel>();
-            return builder.Build();
-        }
-
-        public void DoNewJob()
-        {
-            CurrentViewModel = Container.Resolve<PdfConverterViewModel>();
+            ListConversionStatusUpdates = new ObservableCollection<string>();
         }
     }
 }
